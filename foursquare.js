@@ -17,17 +17,17 @@ var cached_all_categories = [];
 
 var cached_queries = []; 
 
-exports.getVenuesByCategories = function (category_id, place, location, callback) {
+exports.getVenuesByCategories = function (category_id,place,location,callback) {
 	var targetUrl = url_by_category.replace("<CATEGORY_ID>", category_id);
 	getVenues(targetUrl,category_id,place,location,callback);
 }
 
-exports.getVenuesByName = function (name, place, location, callback) {
+exports.getVenuesByName = function (name,place,location,callback) {
 	var targetUrl = url_by_name.replace("<QUERY>", name);
 	getVenues(targetUrl,name,place,location,callback);
 }
 
-function getVenues(url, query, place, location, callback) {
+function getVenues(url,query,place,location,callback) {
 
 	var radius = 2000;
 	if(place === 'Singapore') {

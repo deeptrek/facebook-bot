@@ -37,7 +37,7 @@ app.post('/webhook/', function (req, res) {
 		if (event.message && event.message.text) {
 			text = event.message.text;
 
-			orchestrate.process_input_query(text,function(venues,error){
+			orchestrate.process_input(text,function(venues,error){
 				if(error) {
 					sendTextMessage(sender, error);
 				} else {
