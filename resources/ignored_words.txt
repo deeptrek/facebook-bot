@@ -1,7 +1,0 @@
-city
-singapore
-mall
-resturant
-street
-square
-center

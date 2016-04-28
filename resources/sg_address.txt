@@ -36,7 +36,7 @@ Chinatown
 Clarke Quay
 Choa Chu Kang
 Yew Tee
-Clementi, Singapore
+Clementi
 Dover
 Pandan Valley
 West Coast
@@ -113,7 +113,6 @@ Serangoon
 Serangoon Gardens
 Serangoon North
 Simpang
-Singapore City
 Somapah
 Tai Seng
 Tampines
@@ -269,7 +268,7 @@ West Coast Plaza
 Westgate Mall
 East Coast Park
 Marina Bay
-Science Centre Singapore
+Science Centre
 Boat Quay
 Clarke Quay
 Bukit Timah
@@ -291,18 +290,301 @@ Bugis Street
 Chinatown
 Little India
 National Stadium
-Singapore Indoor Stadium
+Indoor Stadium
 Esplanade – Theatres on the Bay
 Haw Par Villa
 Resorts World Sentosa
-Singapore Flyer
-Universal Studios Singapore
+Flyer
+Universal Studios
 Wild Wild Wet
-Singapore Ducktours
+Ducktours
 Helix Bridge
 Southern Ridges
 Jurong Bird Park
 Night Safari
 River Safari
-Singapore Zoo
+Zoo
 Beauty World Centre
+
+
+
+Ang Mo Kio
+Kebun Baru
+Mayflower
+Teck Ghee
+Chong Boon
+Cheng San
+Yio Chu Kang
+Ang Mo Kio Central
+
+Bedok
+Fengshan
+Kampong Chai Chee
+Kaki Bukit Central
+Kaki Bukit
+Bedok Reservoir
+
+Bishan
+Bukit Merah
+Bukit Panjang
+Choa Chu Kang
+Clementi
+Geylang
+Hougang
+
+Jurong East
+Jurong Gateway
+Yuhua
+Jurong Central
+Jurong West
+Jurong Green
+Jurong Spring
+Boon Lay
+Gek Poh Ville
+Nanyang
+Pioneer
+Kallang/Whampoa
+Pasir Ris
+Punggol
+Queenstown
+Sembawang
+Serangoon
+
+Sengkang
+Rivervale
+Compassvale
+Buangkok
+Anchorvale
+Fernvale
+Jalan Kayu
+Simei
+Tampines
+Tampines North
+Toa Payoh
+
+Woodlands
+Marsiling
+Woodgrove
+Admiralty
+
+Yishun
+Yishun North
+Taman Yishun
+Yishun East
+Yishun Central
+Yishun West
+Yishun South
+
+Amoy Street
+Ang Mo Kio Avenue 8
+Ann Siang Hill
+Anson
+Arab Street
+Armenian Street
+Adam
+
+Baghdad Street
+Balestier
+Banda Street
+Bartley Road
+Beach Road
+Bencoolen Street
+Bernam Street
+Bishan Road
+Boat Quay
+Boon Lay Way
+Boon Tat Street
+Boundary Road
+Bras Basah Road
+Buangkok Green
+Bugis
+Bukit Batok Road
+Bukit Panjang Road
+Bukit Pasoh Road
+Bukit Timah Road
+
+Cantonment Road
+Central Boulevard
+Choa Chu Kang Road
+Clarke Quay
+Clementi Road
+Club Street
+Collyer Quay
+Commonwealth Avenue West
+Commonwealth Avenue
+Connaught Drive
+Craig Road
+Cross Street
+
+Dickenson Hill Road
+Duxton Hill
+
+East Coast Park Service Road
+Ellis Road
+Erskine Road
+Eu Tong Sen Street
+
+Finlayson Green
+Fort Canning Tunnel
+
+Geylang Road
+
+Haji Lane
+Heritage road
+Hill Street
+Holland Road
+
+Jalan Ahmad Ibrahim
+Jalan Ampas
+Jalan Bahar
+Jalan Benaan Kapal
+Jalan Besar
+Jalan Boon Lay
+Jalan Bukit Merah
+Jalan Kayu
+Jiak Chuan Road
+Jurong Island Highway
+Jurong Road
+Jurong Town Hall Road
+Jurong West Avenue 2
+
+Kallang Road
+Keong Saik Road
+King's Road
+Kreta Ayer Road
+
+MacRitchie Viaduct
+Mandai Road
+Marina Boulevard
+Marine Parade Road
+McCallum Street
+Middle Road
+Mosque Street
+
+Napier Road
+Neil Road
+New Bridge Road
+Nicoll Highway
+North Bridge Road
+
+Old Airport Road
+Ophir Road
+Orchard Boulevard
+Orchard Road
+Outer Ring Road System
+
+Pasir Laba Road
+Pasir Panjang Road
+Pasir Ris Drive 3
+Peck Seah Street
+Punggol Road
+
+Queen Street
+
+Ring Road
+Robinson Road
+
+Sago Lane
+Sago Street
+Scotts Road
+Sembawang Road
+Serangoon Road
+Shenton Way
+Road signs
+Simei Avenue
+Sims Avenue
+Smith Street
+South Bridge Road
+Spring Street
+Stamford Road
+Stanley Street
+Sungei Road
+
+Tanglin Road
+Teck Lim Road
+Temple Street
+Teo Hong Road
+Thomson Road
+Tras Street
+Trengganu Street
+
+Upper Changi Road East
+Upper Cross Street
+
+Victoria Street
+
+Waterloo Street
+West Coast Highway
+Woodlands Road
+Woodsville Interchange
+
+Alexandra Road
+Ang Mo Kio Avenue 6
+Balestier Road
+Bartley Road
+Beach Road
+Boundary Road
+Bras Basah Road
+Bukit Batok Road
+Bukit Panjang Road
+Bukit Timah Road
+Changi Road
+Choa Chu Kang Road
+Clementi Road
+Commonwealth Avenue
+Dunearn Road
+East Coast Road
+Eu Tong Sen Street
+Geylang Road
+Holland Road
+Jalan Ahmad Ibrahim
+Jalan Besar
+Jalan Boon Lay
+Jalan Bukit Merah
+Jalan Kayu
+Jurong Island Highway
+Jurong Road
+Jurong West Avenue 2
+Kallang Bahru
+Kallang Road
+Kallang Way
+Lentor Avenue
+Lim Chu Kang Road
+Lorong Chuan
+Loyang Avenue
+Mandai Road
+Marine Parade Road
+New Bridge Road
+New Upper Changi Road
+Nicoll Highway
+North Bridge Road
+Orchard Road
+Outer Ring Road
+Pasir Panjang Road
+Pasir Ris Drive 3
+Paya Lebar Road
+Punggol Road
+Queensway
+River Valley Road
+Robinson Road
+Scotts Road
+Sembawang Road
+Serangoon Road
+Sheares Avenue
+Shenton Way
+Simei Avenue
+Sims Avenue
+South Bridge Road
+Sungei Road
+Tampines Avenue 5
+Tampines Road
+Telok Blangah Road
+Thomson Road
+Upper Changi Road
+East Victoria Street
+West Coast Road
+West Coast Highway
+Woodlands Road
+Woodlands Avenue 3
+Yishun Avenue 2
+Yio Chu Kang Road

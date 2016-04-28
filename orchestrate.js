@@ -7,11 +7,10 @@ var foursquare = require('./foursquare');
 foursquare.getAllCategories();
 
 
-exports.process_input = function (input_str,callback) {
-	//query_processer.process_input_query(input_str,process_location_food,callback);	
+exports.process_input = function (input_str,callback) {	
 	query_processer.process_input_query(input_str,function(result){
 		if(result) {
-			process_location_food(result.location,result.food,callback);	
+			process_location_food(result.place,result.food,callback);	
 		} else {
 			callback(undefined,errors.getMsg("INPUT_PARSE_ERROR"));
 		}
@@ -30,8 +29,7 @@ function process_location_food(place,food,callback) {
 			var result = foursquare.getCategoryIds(food);
 
 			if(result.length === 0) {
-				//cannot find any category, try search by venue name
-				console.log("cannot find any category for: "+food+", using venue name instead");
+				console.log("cannot find any category for ("+food+"), using venue name instead");
 
 				foursquare.getVenuesByName(food,place,code,function(venues){
 					sendBackVenues(venues,food,callback);

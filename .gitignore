@@ -1,3 +1,5 @@
 node_modules/
 private.txt
 .DS_Store
+temp.js
+test.js
