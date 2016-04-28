@@ -11,6 +11,8 @@
   "dependencies": {
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
-    "request": "^2.71.0"
+    "request": "^2.71.0",
+    "node-geocoder": "^3.9.1",
+    "node-rest-client": "^1.8.0"
   }
 }

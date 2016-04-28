@@ -1,53 +1,54 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var request = require('request')
-var app = express()
+var express = require('express');
+var bodyParser = require('body-parser');
+var request = require('request');
+var app = express();
 
-app.set('port', (process.env.PORT || 8886))
+var token = "<FACEBOOK_PAGE_TOKEN>";
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
+var orchestrate = require('./orchestrate');
 
-// parse application/json
-app.use(bodyParser.json())
+app.set('port', (process.env.PORT || 8886));
+
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(bodyParser.json());
 
 // index
 app.get('/', function (req, res) {
-	res.send('hello world i am a secret bot')
+	res.send('hello world i am a secret bot');
 })
 
 // for facebook verification
 app.get('/webhook/', function (req, res) {
 	if (req.query['hub.verify_token'] === 'my_voice_is_my_password_verify_me') {
-		res.send(req.query['hub.challenge'])
+		res.send(req.query['hub.challenge']);
 	}
-	res.send('Error, wrong token')
+	res.send('Error, wrong token');
 })
 
 // to post data
 app.post('/webhook/', function (req, res) {
-	messaging_events = req.body.entry[0].messaging
+	messaging_events = req.body.entry[0].messaging;
+
 	for (i = 0; i < messaging_events.length; i++) {
-		event = req.body.entry[0].messaging[i]
-		sender = event.sender.id
+		event = req.body.entry[0].messaging[i];
+		sender = event.sender.id;
+
 		if (event.message && event.message.text) {
-			text = event.message.text
-			if (text === 'Generic') {
-				sendGenericMessage(sender)
-				continue
-			}
-			sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
-		}
-		if (event.postback) {
-			text = JSON.stringify(event.postback)
-			sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
-			continue
+			text = event.message.text;
+
+			orchestrate.process_input_query(text,function(venues,error){
+				if(error) {
+					sendTextMessage(sender, error);
+				} else {
+					sendGenericMessage(sender,venues);
+				}
+			});
 		}
 	}
 	res.sendStatus(200)
 })
 
-var token = "EAAPXLFg2W6IBACOnHKNZAvFt2ycHIE8ooUD0Tu5AvRZAR2LZBDZBCzcj3jD6VTXnmZBt6rMlW7TeZAhHkOzyFUhhoLuU3xqcFhwfLtetm4En3oaOSc6llOpyZBX65FZCFHLUPpRaxVRd7KdnAcksogLu55Jetb4BVIaGPjuXDXyglAZDZD"
 
 function sendTextMessage(sender, text) {
 	messageData = {
@@ -70,38 +71,51 @@ function sendTextMessage(sender, text) {
 	})
 }
 
-function sendGenericMessage(sender) {
+function sendGenericMessage(sender,venues) {
+
 	messageData = {
 		"attachment": {
 			"type": "template",
 			"payload": {
 				"template_type": "generic",
-				"elements": [{
-					"title": "First card",
-					"subtitle": "Element #1 of an hscroll",
-					"image_url": "http://messengerdemo.parseapp.com/img/rift.png",
-					"buttons": [{
-						"type": "web_url",
-						"url": "https://www.messenger.com",
-						"title": "web url"
-					}, {
-						"type": "postback",
-						"title": "Postback",
-						"payload": "Payload for first element in a generic bubble",
-					}],
-				}, {
-					"title": "Second card",
-					"subtitle": "Element #2 of an hscroll",
-					"image_url": "http://messengerdemo.parseapp.com/img/gearvr.png",
-					"buttons": [{
-						"type": "postback",
-						"title": "Postback",
-						"payload": "Payload for second element in a generic bubble",
-					}],
-				}]
+				"elements": []
 			}
 		}
-	}
+	};
+
+	venues.forEach(function(venue){
+		var ele = {};
+		ele["title"] = venue.name;
+		var contact = venue.location.address;
+		if(venue.contact.phone){
+			if(contact) {
+				contact = contact + ","+ venue.contact.phone;
+			} else {
+				contact = venue.contact.phone;
+			}
+		}
+		ele["subtitle"] = contact;
+
+		var buttons = [{
+						"type": "web_url",
+						"url": "https://maps.google.com/?q="+venue.location.lat+","+venue.location.lng,
+						"title": "Map"
+					}];
+
+		if(venue.url) {
+			buttons.push({
+						"type": "web_url",
+						"url": venue.url,
+						"title": "Web Url"
+					});
+		}
+
+		if(venue.location)
+
+		ele["buttons"] = buttons;
+		messageData.attachment.payload.elements.push(ele);
+	});
+
 	request({
 		url: 'https://graph.facebook.com/v2.6/me/messages',
 		qs: {access_token:token},
