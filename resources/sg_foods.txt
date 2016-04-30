@@ -63,7 +63,6 @@ Mee soto
 Satay bee hoon
 chicken noodles
 Singapore-style noodles
-bee hoon
 Curry Rice
 Bak kut teh
 Chai tow kway
@@ -109,4 +108,44 @@ Cendol
 Bandung
 Chin chow drink
 Singapore Sling
+
 Chicken Rice
+Curry
+Seafood
+Crab
+Nasi Lemak
+coconut rice
+Carrot Cake
+Wanton Mee
+Dim Sum
+Kaya Toast
+Soft boiled Eggs
+Laksa
+Curry Fish Head
+Bak Chor Mee
+Minced Meat Noodle
+Orh Lua
+Hokkien Prawn Mee
+Satay
+bee hoon
+BBQ Sambal Sting Ray
+Sting Ray
+Tau Huay
+Dou Hua
+Ice Kacang
+Chwee Kway
+Water Rice Cake
+Durian
+Biryani
+Roti Prata
+Prata
+Fish Head
+fish slice Bee Hoon
+Rojak
+Fish Head Steamboat
+Popiah
+kebab
+turkish wrap
+wrap
+Burger
+Sushi

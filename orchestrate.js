@@ -2,18 +2,17 @@ var geocode = require('./geocode');
 var errors = require('./errors');
 
 var query_processer = require('./process_query');
-
 var foursquare = require('./foursquare');
-foursquare.getAllCategories();
-
 
 exports.process_input = function (input_str,callback) {	
-	query_processer.process_input_query(input_str,function(result){
-		if(result) {
-			process_location_food(result.place,result.food,callback);	
-		} else {
-			callback(undefined,errors.getMsg("INPUT_PARSE_ERROR"));
-		}
+	foursquare.getAllCategories(function(){
+		query_processer.process_input_query(input_str,function(result){
+			if(result) {
+				process_location_food(result.place,result.food,callback);	
+			} else {
+				callback(undefined,errors.getMsg("INPUT_PARSE_ERROR"));
+			}
+		});		
 	});
 }
 

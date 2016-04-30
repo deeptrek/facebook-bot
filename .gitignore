@@ -3,3 +3,5 @@ private.txt
 .DS_Store
 temp.js
 test.js
+change_marker.sh
+revert_marker.sh

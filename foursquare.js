@@ -8,7 +8,6 @@ var url_by_category = "https://api.foursquare.com/v2/venues/search?categoryId=<C
 
 var url_by_name = "https://api.foursquare.com/v2/venues/search?client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806&ll=<LOCATION>&intent=browse&radius=<RADIUS>&query=<QUERY>";
 
-
 var all_categories_url = "https://api.foursquare.com/v2/venues/categories?client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806";
 
 var cached_venues = {};
@@ -66,7 +65,7 @@ function getVenues(url,query,place,location,callback) {
 }
 
 
-exports.getAllCategories = function(){
+exports.getAllCategories = function(callback){
 	var size = cached_all_categories.length;
 	console.log("Start geting all categories: "+size);
 	if(size === 0) {
@@ -78,9 +77,11 @@ exports.getAllCategories = function(){
 		client.get(all_categories_url, function (data, response) {	
 			cached_all_categories = data.response.categories;
 			console.log("Done geting all categories: "+cached_all_categories.length);
+			callback();
 		});	
 	} else {
 		console.log("All categories already cached");
+		callback();
 	}
 }
 
