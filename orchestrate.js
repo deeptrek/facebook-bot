@@ -4,11 +4,11 @@ var errors = require('./errors');
 var query_processer = require('./process_query');
 var foursquare = require('./foursquare');
 
-exports.process_input = function (input_str,callback) {	
+function processInput(input_str,callback) {	
 	foursquare.getAllCategories(function(){
 		query_processer.process_input_query(input_str,function(result){
 			if(result) {
-				process_location_food(result.place,result.food,callback);	
+				processLocationFood(result.place,result.food,callback);	
 			} else {
 				callback(undefined,errors.getMsg("INPUT_PARSE_ERROR"));
 			}
@@ -16,7 +16,11 @@ exports.process_input = function (input_str,callback) {
 	});
 }
 
-function process_location_food(place,food,callback) {
+function getVenueById(venue_id,callback){
+	foursquare.getVenueById(venue_id,callback);
+}
+
+function processLocationFood(place,food,callback) {
 	console.log("Start process place ("+place+") for food: ("+food+")");
 
     geocode.getGeoCode(place,function(code,error){
@@ -47,18 +51,14 @@ function process_location_food(place,food,callback) {
 
 function sendBackVenues(venues,food,callback){
 	if(venues) {
-		
-		/*
-		venues.sort(function(a,b){
-			return b.stats.checkinsCount - a.stats.checkinsCount;
-		});
-
-		var top5venues = venues.slice(0,5);
-		*/
-
 		callback(venues,undefined);
 	} else {
 		var errMsg = errors.getMsg("NO_FOOD").replace("{0}",food);
 		callback(undefined,errMsg);
 	}
 }
+
+module.exports = {
+	processInput: processInput,
+	getVenueById: getVenueById
+};

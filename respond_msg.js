@@ -1,22 +1,30 @@
 var request = require('request');
-var foursquare = require('./foursquare');
+var orchestrate = require('./orchestrate');
 var errors = require('./errors');
 
 var token = "<FACEBOOK_PAGE_TOKEN>";
 
-exports.sendTextMessage = function (sender, text) {
-	sendTextMsgInternal(sender.txt);
-}
+var pageSieze = 5;
 
-exports.sendQueryMessage = function (sender,venues) {
+function sendQueryMessage(sender,venues,text,page,sortType) {
 
 	var elements = [];
-	venues.sort(function(a,b){
-		return b.stats.checkinsCount - a.stats.checkinsCount;
-	});
 
-	var top5venues = venues.slice(0,5);
-	top5venues.forEach(function(venue){
+	if(sortType === "1") {
+		venues.sort(function(a,b){
+			return b.stats.checkinsCount - a.stats.checkinsCount;
+		});
+	} else {
+		venues.sort(function(a,b){
+			return a.location.distance - b.location.distance;
+		});		
+	}
+
+	var fromInd = page * pageSieze;
+	var endInd = (page+1) * pageSieze;
+
+	var targetVenues = venues.slice(fromInd,endInd);
+	targetVenues.forEach(function(venue){
 		var ele = {};
 		ele["title"] = venue.name;
 		var contact = undefined;
@@ -33,42 +41,60 @@ exports.sendQueryMessage = function (sender,venues) {
 				"type": "web_url",
 				"url": "https://maps.google.com/?q="+venue.location.lat+","+venue.location.lng,
 				"title": "Map"
-			},
-			{
+			}
+		];
+		if(sortType === "1") {
+			buttons.push({
 				"type": "postback",
 				"title": "Popularity: "+venue.stats.checkinsCount,
-				"payload": "VENUE_STAT,"+venue.id
-			},			
-            {
-            	"type": "postback",
-            	"title": "More Info",
-            	"payload": "VENUE_NFO,"+venue.id
-          	}
-		];
+				"payload": "VENUE_STAT-@-"+venue.id				
+			});
+			
+		} else {
+			buttons.push({
+				"type": "postback",
+				"title": "Distance: "+venue.location.distance,
+				"payload": "VENUE_STAT-@-"+venue.id				
+			});
+		}
+
+		buttons.push({
+        	"type": "postback",
+        	"title": "More Info",
+        	"payload": "VENUE_NFO-@-"+venue.id		
+		});
+
 		ele["buttons"] = buttons;
 		elements.push(ele);
 	});
 	
-	
+	var remainingVenues = venues.slice(endInd);
+
+	var sortTitle;
+	if(sortType === "1") {
+		sortTitle = "Sort by Distance";
+	} else {
+		sortTitle = "Sort by Popularity";
+	}
+
 	var last_element;
-	if(venues.length>1) {
+	if(remainingVenues.length>1) {
 		last_element = {};
 		last_element["title"] = "More Options";
 		last_element["buttons"]=[
 			{
             	"type": "postback",
-            	"title": "Sort By Distance",
-            	"payload": "SORT_DISTANCE"
+            	"title": sortTitle,
+            	"payload": "SORT_DISTANCE-@-"+sortType+"-@-"+text
         	}
         ];
 	}
 
-	
-	if(venues.length>5) {
+	if(remainingVenues.length>5) {
 		last_element.buttons.push({
             	"type": "postback",
             	"title": "More Result",
-            	"payload": "MORE_RESULT"
+            	"payload": "MORE_RESULT-@-"+sortType+"-@-"+page+"-@-"+text
         });		
 	}
 	
@@ -76,32 +102,20 @@ exports.sendQueryMessage = function (sender,venues) {
 		elements.push(last_element);	
 	}	
 
-	sendTemplateMessage(sender,elements);
+	sendGenericMsgInternal(sender,elements);
 }
 
-exports.sendPostbackMessage = function (sender, text) {
+function sendPostbackMessage(sender, text) {
+	var info = text.split("-@-");
 
-	var info = text.split(",");
+	console.log("Postback message: "+info);
+	
 	var command = info[0];
-	var venue_id = info[1];
-
-	if(command.startsWith("VENUE_")) {
-		foursquare.getVenueById(venue_id,function(venue){
-
+	
+	if(command === "VENUE_NFO") {
+		var venue_id = info[1];
+		orchestrate.getVenueById(venue_id,function(venue){
 			if(venue) {
-				messageData = {
-					"attachment": {
-						"type": "template",
-						"payload": {
-							"template_type": "generic",
-							"elements": []
-						}
-					}
-				};
-				var ele = {};
-				ele["title"] = venue.name;		
-				//ele["subtitle"] = contact;
-
 				var buttons = [
 					{
 						"type": "web_url",
@@ -109,55 +123,124 @@ exports.sendPostbackMessage = function (sender, text) {
 						"title": "Web Url"
 					}
 				];
-
-				ele["buttons"] = buttons;
+				if(venue.popular && venue.popular.timeframes) {
+					var openHour = "";
+					venue.popular.timeframes.forEach(function(tf){
+						if(tf.days === "Today"){
+							tf.open.forEach(function(slot){
+								openHour = openHour + slot.renderedTime + " ";
+							});
+							openHour = openHour.trim();
+						}						
+					});						
+					buttons.push({
+				    	"type": "postback",
+				        "title": openHour,
+				        "payload": "MORE_OPEN_HOURS-@-"+venue.id
+					});				
+				}
 				
-				sendTemplateMessage(sender,[ele]);
+				var text = "Venue Details";
+				if(venue.contact.phone){
+					text = "Phone: "+venue.contact.phone;
+				}
+
+				sendButtonMsgInternal(sender,text,buttons);
 
 			} else {
-				sendTextMsgInternal(sender,errors.getMsg("INTERANL_ERROR"));
+				sendTextMessage(sender,errors.getMsg("INTERANL_ERROR"));
 			}
 		});
+	} else if(command === "MORE_OPEN_HOURS") {
+
+		var venue_id = info[1];
+		orchestrate.getVenueById(venue_id,function(venue){
+			if(venue.popular.timeframes) {
+				var openHour = "Opening: ";
+				venue.popular.timeframes.forEach(function(tf){
+					openHour = openHour + tf.days + ": ";
+					tf.open.forEach(function(slot){
+						openHour = openHour + slot.renderedTime + " ";
+					});
+					openHour = openHour.trim()+"; ";						
+				});	
+				sendTextMessage(sender,openHour);
+			} else {
+				sendTextMessage(sender,"No popular opening hours");	
+			}
+		});	
+
+
+	} else if(command === "SORT_DISTANCE") {
+		var sortType = info[1];
+		var text = info[2];
+
+		if(sortType==="1") {
+			sortType = "2";
+		} else {
+			sortType = "1";
+		}
+
+		orchestrate.processInput(text,function(venues,error){
+			if(error) {
+				sendTextMessage(sender,error);
+			} else {
+				sendQueryMessage(sender,venues,text,0,sortType);
+			}
+		});			
+	} else if(command === "MORE_RESULT") {
+		var sortType = info[1];
+		var page = parseInt(info[2]);
+		var text = info[3];
+
+		orchestrate.processInput(text,function(venues,error){
+			if(error) {
+				sendTextMessage(sender,error);
+			} else {
+				sendQueryMessage(sender,venues,text,page+1,sortType);
+			}
+		});		
 	} else {
-		sendTextMsgInternal(sender,"TO BE IMPLEMENTED");
+		sendTextMessage(sender,"TO BE IMPLEMENTED");
 	}
 }
 
-function sendTextMsgInternal(sender, text){
+function sendTextMessage(sender, text){
 	messageData = {
 		text:text
 	}
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {access_token:token},
-		method: 'POST',
-		json: {
-			recipient: {id:sender},
-			message: messageData,
-		}
-	}, function(error, response, body) {
-		if (error) {
-			console.log('Error sending messages: ', error)
-		} else if (response.body.error) {
-			console.log('Error: ', response.body.error)
-		}
-	})	
+	sendMsg(sender,messageData);
 }
 
-function sendTemplateMessage(sender, elements){
-
+function sendGenericMsgInternal(sender, elements){
 	messageData = {
 		"attachment": {
 			"type": "template",
 			"payload": {
 				"template_type": "generic",
-				"elements": []
+				"elements": elements
 			}
 		}
 	};
+	sendMsg(sender,messageData);
+}
 
-	messageData.attachment.payload.elements = elements;
+function sendButtonMsgInternal(sender, text, buttons){
+	messageData = {
+		"attachment": {
+			"type": "template",
+			"payload": {
+				"template_type": "button",
+				"text": text,
+				"buttons": buttons
+			}
+		}
+	};
+	sendMsg(sender,messageData);
+}
 
+
+function sendMsg(sender, messageData){
 	request({
 		url: 'https://graph.facebook.com/v2.6/me/messages',
 		qs: {access_token:token},
@@ -174,3 +257,9 @@ function sendTemplateMessage(sender, elements){
 		}
 	})	
 }
+
+module.exports = {
+	sendTextMessage: sendTextMessage,
+	sendQueryMessage: sendQueryMessage,
+	sendPostbackMessage: sendPostbackMessage
+};

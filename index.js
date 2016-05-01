@@ -1,15 +1,11 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var res_msg = require('./respond_msg');
-
-var app = express();
-
 var orchestrate = require('./orchestrate');
 
+var app = express();
 app.set('port', (process.env.PORT || 8886));
-
 app.use(bodyParser.urlencoded({extended: false}));
-
 app.use(bodyParser.json());
 
 // index
@@ -36,11 +32,11 @@ app.post('/webhook/', function (req, res) {
 
 		if (event.message && event.message.text) {
 			text = event.message.text;
-			orchestrate.process_input(text,function(venues,error){
+			orchestrate.processInput(text,function(venues,error){
 				if(error) {
 					res_msg.sendTextMessage(sender,error);
 				} else {
-					res_msg.sendQueryMessage(sender,venues);
+					res_msg.sendQueryMessage(sender,venues,text,0,"1");
 				}
 			});		
 		}
