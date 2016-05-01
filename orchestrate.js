@@ -47,8 +47,16 @@ function process_location_food(place,food,callback) {
 
 function sendBackVenues(venues,food,callback){
 	if(venues) {
+		
+		/*
+		venues.sort(function(a,b){
+			return b.stats.checkinsCount - a.stats.checkinsCount;
+		});
+
 		var top5venues = venues.slice(0,5);
-		callback(top5venues,undefined);
+		*/
+
+		callback(venues,undefined);
 	} else {
 		var errMsg = errors.getMsg("NO_FOOD").replace("{0}",food);
 		callback(undefined,errMsg);

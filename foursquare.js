@@ -5,16 +5,14 @@ var cliend_id = "<FOURSQUARE_CLIENT_ID>";
 var client_secret = "<FOURSQUARE_CLIENT_SECRET>";
 
 var url_by_category = "https://api.foursquare.com/v2/venues/search?categoryId=<CATEGORY_ID>&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806&ll=<LOCATION>&intent=browse&radius=<RADIUS>";
-
 var url_by_name = "https://api.foursquare.com/v2/venues/search?client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806&ll=<LOCATION>&intent=browse&radius=<RADIUS>&query=<QUERY>";
-
 var all_categories_url = "https://api.foursquare.com/v2/venues/categories?client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806";
-
-var cached_venues = {};
+var url_by_venue_id = "https://api.foursquare.com/v2/venues/<VENUE_ID>?client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&v=20140806";
 
 var cached_all_categories = []; 
-
-var cached_queries = []; 
+var cached_venues = {};
+var cached_queries = {}; 
+var cached_venue_details = {};
 
 exports.getVenuesByCategories = function (category_id,place,location,callback) {
 	var targetUrl = url_by_category.replace("<CATEGORY_ID>", category_id);
@@ -45,18 +43,34 @@ function getVenues(url,query,place,location,callback) {
 		console.log("get result for key: "+key);
 		callback(cached_venues[key]);
 	} else {
-		client.get(targetUrl, function (data, response) {	
-
+		client.get(targetUrl, function (data, response) {
 			venues = data.response.venues;
-
 			if(venues && venues.length > 0){
-
-				venues.sort(function(a,b){
-					return a.location.distance - b.location.distance;
-				});
-
 				cached_venues[key] = venues;
 				callback(venues);
+			} else {
+				callback(undefined);
+			}
+		});
+	}
+}
+
+
+exports.getVenueById = function(venue_id, callback) {
+	var targetUrl = url_by_venue_id
+		.replace("<VENUE_ID>", venue_id)
+		.replace("<CLIENT_ID>", cliend_id)
+		.replace("<CLIENT_SECRET>", client_secret);	
+
+	if(cached_venue_details[venue_id]) {
+		console.log("get result for venue_id: "+venue_id);
+		callback(cached_venue_details[venue_id]);
+	} else {
+		client.get(targetUrl, function (data, response) {
+			var venue = data.response.venue;
+			if(venue){
+				cached_venue_details[venue_id] = venue;
+				callback(venue);
 			} else {
 				callback(undefined);
 			}

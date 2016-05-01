@@ -1,9 +1,8 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var request = require('request');
-var app = express();
+var res_msg = require('./respond_msg');
 
-var token = "<FACEBOOK_PAGE_TOKEN>";
+var app = express();
 
 var orchestrate = require('./orchestrate');
 
@@ -28,6 +27,7 @@ app.get('/webhook/', function (req, res) {
 
 // to post data
 app.post('/webhook/', function (req, res) {
+
 	messaging_events = req.body.entry[0].messaging;
 
 	for (i = 0; i < messaging_events.length; i++) {
@@ -36,102 +36,22 @@ app.post('/webhook/', function (req, res) {
 
 		if (event.message && event.message.text) {
 			text = event.message.text;
-
 			orchestrate.process_input(text,function(venues,error){
 				if(error) {
-					sendTextMessage(sender, error);
+					res_msg.sendTextMessage(sender,error);
 				} else {
-					sendGenericMessage(sender,venues);
+					res_msg.sendQueryMessage(sender,venues);
 				}
-			});
+			});		
 		}
+
+		if (event.postback) {
+			res_msg.sendPostbackMessage(sender,event.postback.payload);
+			continue;
+		}	
 	}
 	res.sendStatus(200)
 })
-
-
-function sendTextMessage(sender, text) {
-	messageData = {
-		text:text
-	}
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {access_token:token},
-		method: 'POST',
-		json: {
-			recipient: {id:sender},
-			message: messageData,
-		}
-	}, function(error, response, body) {
-		if (error) {
-			console.log('Error sending messages: ', error)
-		} else if (response.body.error) {
-			console.log('Error: ', response.body.error)
-		}
-	})
-}
-
-function sendGenericMessage(sender,venues) {
-
-	messageData = {
-		"attachment": {
-			"type": "template",
-			"payload": {
-				"template_type": "generic",
-				"elements": []
-			}
-		}
-	};
-
-	venues.forEach(function(venue){
-		var ele = {};
-		ele["title"] = venue.name;
-		var contact = venue.location.address;
-		if(venue.contact.phone){
-			if(contact) {
-				contact = contact + ","+ venue.contact.phone;
-			} else {
-				contact = venue.contact.phone;
-			}
-		}
-		ele["subtitle"] = contact;
-
-		var buttons = [{
-						"type": "web_url",
-						"url": "https://maps.google.com/?q="+venue.location.lat+","+venue.location.lng,
-						"title": "Map"
-					}];
-
-		if(venue.url) {
-			buttons.push({
-						"type": "web_url",
-						"url": venue.url,
-						"title": "Web Url"
-					});
-		}
-
-		if(venue.location)
-
-		ele["buttons"] = buttons;
-		messageData.attachment.payload.elements.push(ele);
-	});
-
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {access_token:token},
-		method: 'POST',
-		json: {
-			recipient: {id:sender},
-			message: messageData,
-		}
-	}, function(error, response, body) {
-		if (error) {
-			console.log('Error sending messages: ', error)
-		} else if (response.body.error) {
-			console.log('Error: ', response.body.error)
-		}
-	})
-}
 
 // spin spin sugar
 app.listen(app.get('port'), function() {
