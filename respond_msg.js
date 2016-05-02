@@ -47,14 +47,14 @@ function sendQueryMessage(sender,venues,text,page,sortType) {
 			buttons.push({
 				"type": "postback",
 				"title": "Popularity: "+venue.stats.checkinsCount,
-				"payload": "VENUE_STAT-@-"+venue.id				
+				"payload": "VENUE_COMMMENTS-@-"+venue.id+"-@-"+0				
 			});
 			
 		} else {
 			buttons.push({
 				"type": "postback",
 				"title": "Distance: "+venue.location.distance,
-				"payload": "VENUE_STAT-@-"+venue.id				
+				"payload": "VENUE_DIST-@-"+venue.id				
 			});
 		}
 
@@ -70,37 +70,32 @@ function sendQueryMessage(sender,venues,text,page,sortType) {
 	
 	var remainingVenues = venues.slice(endInd);
 
+	var ele;
 	var sortTitle;
 	if(sortType === "1") {
 		sortTitle = "Sort by Distance";
 	} else {
 		sortTitle = "Sort by Popularity";
 	}
-
-	var last_element;
 	if(remainingVenues.length>1) {
-		last_element = {};
-		last_element["title"] = "More Options";
-		last_element["buttons"]=[
-			{
+		ele = {};
+		ele["title"] = "More Options";	
+		ele["buttons"] = [];
+		ele["buttons"].push({
             	"type": "postback",
             	"title": sortTitle,
             	"payload": "SORT_DISTANCE-@-"+sortType+"-@-"+text
-        	}
-        ];
+        });
+        elements.push(ele);
 	}
 
-	if(remainingVenues.length>5) {
-		last_element.buttons.push({
+	if(remainingVenues.length>pageSieze) {
+		ele["buttons"].push({
             	"type": "postback",
             	"title": "More Result",
             	"payload": "MORE_RESULT-@-"+sortType+"-@-"+page+"-@-"+text
         });		
 	}
-	
-	if(last_element) {
-		elements.push(last_element);	
-	}	
 
 	sendGenericMsgInternal(sender,elements);
 }
@@ -139,18 +134,71 @@ function sendPostbackMessage(sender, text) {
 				        "payload": "MORE_OPEN_HOURS-@-"+venue.id
 					});				
 				}
-				
-				var text = "Venue Details";
 				if(venue.contact.phone){
-					text = "Phone: "+venue.contact.phone;
+					var str = "Phone: "+venue.contact.phone;
+					buttons.push({
+						"type": "web_url",
+						"url": venue.canonicalUrl,
+						"title": str
+					});						
 				}
-
-				sendButtonMsgInternal(sender,text,buttons);
+				sendButtonMsgInternal(sender,venue.name,buttons);
 
 			} else {
 				sendTextMessage(sender,errors.getMsg("INTERANL_ERROR"));
 			}
 		});
+	} else if(command === "VENUE_DIST") {
+
+		var venue_id = info[1];
+		orchestrate.getVenueById(venue_id,function(venue){
+			var msg = "Address - "+venue.location.address+"; ";
+			if(venue.location.crossStreet) {
+				msg = msg + "Cross Street - "+venue.location.crossStreet
+			}
+			sendTextMessage(sender,msg);
+		});	
+
+	} else if(command === "VENUE_COMMMENTS") {
+		var venue_id = info[1];
+
+		orchestrate.getVenueById(venue_id,function(venue){
+
+			if(venue.tips.groups && venue.tips.groups[0] && venue.tips.groups[0].items) {
+				var all_comments = venue.tips.groups[0].items;
+				var start_ind = info[2];
+				var end_ind = parseInt(start_ind)+2;
+
+				console.log("total_comment_length: "+all_comments.length+", start_ind: "+start_ind+", end_ind: "+end_ind);
+				var buttons = [];
+				for(var i=start_ind;i<end_ind && i<all_comments.length;i++){
+					buttons.push({
+						"type": "postback",
+						"title": all_comments[i].text,
+						"payload": "VENUE_COMMMENT_DETAIL-@-"+all_comments[i].text	
+					});
+				}
+				if(end_ind < all_comments.length) {
+					buttons.push({
+						"type": "postback",
+						"title": "More Comments",
+						"payload": "VENUE_COMMMENTS-@-"+venue.id+"-@-"+end_ind			
+					});
+				}
+
+				if(buttons.length>0) {							
+					sendButtonMsgInternal(sender,venue.name+" Reviews",buttons);
+				}
+			} else {
+				sendTextMessage(sender,"No Reviews");
+			}
+		});	
+
+	} else if(command === "VENUE_COMMMENT_DETAIL") {
+
+		var comment = info[1];
+		sendTextMessage(sender,comment);
+
 	} else if(command === "MORE_OPEN_HOURS") {
 
 		var venue_id = info[1];
@@ -159,10 +207,13 @@ function sendPostbackMessage(sender, text) {
 				var openHour = "Opening: ";
 				venue.popular.timeframes.forEach(function(tf){
 					openHour = openHour + tf.days + ": ";
-					tf.open.forEach(function(slot){
-						openHour = openHour + slot.renderedTime + " ";
-					});
-					openHour = openHour.trim()+"; ";						
+					for(var i=0;i<tf.open.length;i++){
+						if(i === tf.open.length-1) {
+							openHour = openHour+tf.open[i].renderedTime+"; ";	
+						} else {
+							openHour = openHour+tf.open[i].renderedTime+", ";
+						}
+					}					
 				});	
 				sendTextMessage(sender,openHour);
 			} else {

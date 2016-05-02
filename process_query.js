@@ -126,7 +126,7 @@ function process_python_output (init_result,input_str,input_str1) {
 	if(!init_result.food){
 		var food = getClosestMatch(candidate_words,cached_all_food,0.9);
 		if(!food) {
-			food = noun_list[0];
+			food = candidate_words[0];
 		}
 		init_result["food"] = food;
 	}
