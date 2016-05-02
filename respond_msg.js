@@ -61,7 +61,7 @@ function sendQueryMessage(sender,venues,text,page,sortType) {
 		buttons.push({
         	"type": "postback",
         	"title": "More Info",
-        	"payload": "VENUE_NFO-@-"+venue.id		
+        	"payload": "VENUE_NFO-@-"+venue.id
 		});
 
 		ele["buttons"] = buttons;
@@ -109,15 +109,11 @@ function sendPostbackMessage(sender, text) {
 	
 	if(command === "VENUE_NFO") {
 		var venue_id = info[1];
+
 		orchestrate.getVenueById(venue_id,function(venue){
 			if(venue) {
-				var buttons = [
-					{
-						"type": "web_url",
-						"url": venue.canonicalUrl,
-						"title": "Web Url"
-					}
-				];
+				var buttons = [];
+
 				if(venue.popular && venue.popular.timeframes) {
 					var openHour = "";
 					venue.popular.timeframes.forEach(function(tf){
@@ -133,16 +129,29 @@ function sendPostbackMessage(sender, text) {
 				        "title": openHour,
 				        "payload": "MORE_OPEN_HOURS-@-"+venue.id
 					});				
-				}
-				if(venue.contact.phone){
-					var str = "Phone: "+venue.contact.phone;
+				}				
+
+				orchestrate.getVenueDetailsByHGW(venue.name,"",function(result){
+					console.log(result);
+
 					buttons.push({
-						"type": "web_url",
-						"url": venue.canonicalUrl,
-						"title": str
+				    	"type": "postback",
+				        "title": result.price,
+				        "payload": "VENUE_PRICE-@-"+result.price
 					});						
-				}
-				sendButtonMsgInternal(sender,venue.name,buttons);
+
+					buttons.push({
+				    	"type": "postback",
+				        "title": result.overallRating,
+				        "payload": "VENUE_RATING-@-"+result.otherRatings
+					});	
+
+					var text = venue.name;
+					if(venue.contact.phone){
+						text = text+", "+venue.contact.phone;					
+					}
+					sendButtonMsgInternal(sender,text,buttons);
+				});
 
 			} else {
 				sendTextMessage(sender,errors.getMsg("INTERANL_ERROR"));
@@ -194,7 +203,9 @@ function sendPostbackMessage(sender, text) {
 			}
 		});	
 
-	} else if(command === "VENUE_COMMMENT_DETAIL") {
+	} else if(command === "VENUE_COMMMENT_DETAIL" 
+			|| command === "VENUE_PRICE"
+			|| command === "VENUE_RATING") {
 
 		var comment = info[1];
 		sendTextMessage(sender,comment);

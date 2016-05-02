@@ -1,8 +1,8 @@
 var geocode = require('./geocode');
 var errors = require('./errors');
-
 var query_processer = require('./process_query');
 var foursquare = require('./foursquare');
+var hungrygowhere = require('./hungrygowhere');
 
 function processInput(input_str,callback) {	
 	foursquare.getAllCategories(function(){
@@ -18,6 +18,10 @@ function processInput(input_str,callback) {
 
 function getVenueById(venue_id,callback){
 	foursquare.getVenueById(venue_id,callback);
+}
+
+function getVenueDetailsByHGW(name,location,callback){
+	hungrygowhere.get_ratings_price(name,location,callback);
 }
 
 function processLocationFood(place,food,callback) {
@@ -60,5 +64,6 @@ function sendBackVenues(venues,food,callback){
 
 module.exports = {
 	processInput: processInput,
-	getVenueById: getVenueById
+	getVenueById: getVenueById,
+	getVenueDetailsByHGW: getVenueDetailsByHGW
 };
