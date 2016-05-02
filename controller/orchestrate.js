@@ -1,8 +1,8 @@
-var geocode = require('./geocode');
-var errors = require('./errors');
-var query_processer = require('./process_query');
-var foursquare = require('./foursquare');
-var hungrygowhere = require('./hungrygowhere');
+var errors = require('../util/errors');
+var query_processer = require('../util/process_query');
+var geocode = require('../thirdparty/geocode');
+var foursquare = require('../thirdparty/foursquare');
+var hungrygowhere = require('../thirdparty/hungrygowhere');
 
 function processInput(input_str,callback) {	
 	foursquare.getAllCategories(function(){

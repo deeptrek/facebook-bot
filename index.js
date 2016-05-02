@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var res_msg = require('./respond_msg');
-var orchestrate = require('./orchestrate');
+var res_msg = require('./controller/respond_msg');
+var orchestrate = require('./controller/orchestrate');
 
 var app = express();
 app.set('port', (process.env.PORT || 8886));

@@ -1,6 +1,6 @@
 var request = require('request');
-var orchestrate = require('./orchestrate');
-var errors = require('./errors');
+var orchestrate = require('../controller/orchestrate');
+var errors = require('../util/errors');
 
 var token = "<FACEBOOK_PAGE_TOKEN>";
 
@@ -134,17 +134,21 @@ function sendPostbackMessage(sender, text) {
 				orchestrate.getVenueDetailsByHGW(venue.name,"",function(result){
 					console.log(result);
 
-					buttons.push({
-				    	"type": "postback",
-				        "title": result.price,
-				        "payload": "VENUE_PRICE-@-"+result.price
-					});						
+					if(result.price) {
+						buttons.push({
+					    	"type": "postback",
+					        "title": result.price,
+					        "payload": "VENUE_PRICE-@-"+result.price
+						});	
+					}					
 
-					buttons.push({
-				    	"type": "postback",
-				        "title": result.overallRating,
-				        "payload": "VENUE_RATING-@-"+result.otherRatings
-					});	
+					if(result.overallRating) {
+						buttons.push({
+					    	"type": "postback",
+					        "title": result.overallRating,
+					        "payload": "VENUE_RATING-@-"+result.otherRatings
+						});	
+					}
 
 					var text = venue.name;
 					if(venue.contact.phone){

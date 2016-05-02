@@ -4,9 +4,13 @@ var natural = require('natural');
 var cached_all_places = [];
 var cached_all_food = [];
 
-cached_items(cached_all_places,"./resources/sg_address.txt")
-cached_items(cached_all_food,"./resources/sg_foods.txt")
-cached_items(cached_all_food,"./resources/common_foods.txt")
+var path = require('path');
+var __parentDir = path.dirname(process.mainModule.filename);
+
+
+cached_items(cached_all_places, __parentDir+"/resources/sg_address.txt")
+cached_items(cached_all_food, __parentDir+"/resources/sg_foods.txt")
+cached_items(cached_all_food, __parentDir+"/resources/common_foods.txt")
 
 function cached_items(cached_list,file_path){
 	var array = fs.readFileSync(file_path).toString().split("\n");
@@ -67,7 +71,7 @@ function match_place_food_list(input_str,next){
 function nltk_process_python(init_result,input_str,callback){
 	var python = require('child_process').spawn(
 	     'python',
-	     ["./pos_tagging.py", input_str]
+	     ["./python/pos_tagging.py", input_str]
 	);
 	python.stdout.on('data', function(data){ 
 		console.log("python output is: "+data);
